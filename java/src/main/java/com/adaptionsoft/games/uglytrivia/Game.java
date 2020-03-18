@@ -1,10 +1,14 @@
 package com.adaptionsoft.games.uglytrivia;
 
+import com.adaptionsoft.games.trivia.MaximumPlayersReachedException;
+import com.adaptionsoft.games.trivia.Player;
+import com.adaptionsoft.games.trivia.PlayerAlreadyExistsException;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Game {
-    ArrayList<String> players = new ArrayList<>();
+    ArrayList<Player> players = new ArrayList<>();
     int[] places = new int[6];
     int[] purses  = new int[6];
     boolean[] inPenaltyBox  = new boolean[6];
@@ -34,10 +38,14 @@ public class Game {
 		return (howManyPlayers() >= 2);
 	}
 
-	public boolean add(String playerName) {
-		
-		
-	    players.add(playerName);
+	public boolean addPlayer(String playerName) {
+        if (players.contains(new Player(playerName))) {
+            throw new PlayerAlreadyExistsException();
+        }
+        if (howManyPlayers() == 5) {
+            throw new MaximumPlayersReachedException();
+        }
+        players.add(new Player(playerName));
 	    places[howManyPlayers()] = 0;
 	    purses[howManyPlayers()] = 0;
 	    inPenaltyBox[howManyPlayers()] = false;
@@ -52,6 +60,9 @@ public class Game {
 	}
 
 	public void roll(int roll) {
+        if (!isPlayable()) {
+            throw new IllegalStateException("You need at least 2 players.");
+        }
 		System.out.println(players.get(currentPlayer) + " is the current player");
 		System.out.println("They have rolled a " + roll);
 		
